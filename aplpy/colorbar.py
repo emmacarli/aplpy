@@ -20,9 +20,8 @@ class Colorbar(object):
         self._axislabel_fontproperties = FontProperties()
 
     @auto_refresh
-    def show(self, location='right', width=0.2, pad=0.05, ticks=None,
-             labels=True, log_format=False, box=None,
-             box_orientation='vertical', axis_label_text=None,
+    def show(self, location='right', width=0.2, pad=0.05, ticks=None, labels=True, format=None,
+             sig_digits=0, box=None, box_orientation='vertical', axis_label_text=None, 
              axis_label_rotation=None, axis_label_pad=5):
         """
         Show a colorbar on the side of the image.
@@ -47,8 +46,12 @@ class Colorbar(object):
         labels : bool, optional
             Whether to show numerical labels.
 
-        log_format : bool, optional
-            Whether to format ticks in exponential notation
+        format : str, optional
+            Format of the colorbar tick labels. Can be 'exp' (exponential 
+            notation) or 'sci' (scientific notation). Default is None.
+            
+        sig_digits: int, optional
+            Number of significant digits if format is set to 'sci'
 
         box : list, optional
             A custom box within which to place the colorbar. This should
@@ -68,7 +71,8 @@ class Colorbar(object):
         self._base_settings['pad'] = pad
         self._base_settings['ticks'] = ticks
         self._base_settings['labels'] = labels
-        self._base_settings['log_format'] = log_format
+        self._base_settings['format'] = format
+        self._base_settings['sig_digits'] = sig_digits
         self._base_settings['box'] = box
         self._base_settings['box_orientation'] = box_orientation
         self._base_settings['axis_label_text'] = axis_label_text
@@ -112,8 +116,10 @@ class Colorbar(object):
                 self._colorbar_axes = self._figure.add_axes(box)
                 orientation = box_orientation
 
-            if log_format:
+            if format == 'exp':
                 format = LogFormatterMathtext()
+            elif format == 'sci':
+                format = '%.' + str(sig_digits) + 'e'
             else:
                 format = None
 
